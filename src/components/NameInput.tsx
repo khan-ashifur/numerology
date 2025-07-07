@@ -1,88 +1,261 @@
 import React, { useState } from 'react';
-import { Calculator, Sparkles, Eye } from 'lucide-react';
+import { Heart, Stars, Info, AlertCircle, Eye, Compass, Zap } from 'lucide-react';
+import { NameInput } from './components/NameInput';
+import { SoulUrgeResult } from './components/SoulUrgeResult';
+import { EmailModal } from './components/EmailModal';
+import { BanglaResult } from './components/BanglaResult';
+import { CalculationSteps } from './components/CalculationSteps';
+import { calculateSoulUrge, calculateSteps } from './utils/numerology';
+import { getPersonalizedInterpretation, getBanglaDetailedInterpretation } from './services/openai';
+import { SoulUrgeResult as SoulUrgeResultType } from './types/numerology';
 
-interface NameInputProps {
-  onCalculate: (name: string) => void;
-  isLoading: boolean;
-}
+function App() {
+  const [result, setResult] = useState<SoulUrgeResultType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingInterpretation, setIsGeneratingInterpretation] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [isGeneratingBangla, setIsGeneratingBangla] = useState(false);
+  const [banglaResult, setBanglaResult] = useState<{
+    interpretation: string;
+    email: string;
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-export function NameInput({ onCalculate, isLoading }: NameInputProps) {
-  const [name, setName] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      onCalculate(name.trim());
+  const handleCalculate = async (name: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const calculationResult = calculateSoulUrge(name);
+      setResult(calculationResult);
+      
+      // Generate personalized interpretation
+      setIsGeneratingInterpretation(true);
+      try {
+        const interpretation = await getPersonalizedInterpretation(
+          calculationResult.number,
+          calculationResult.name,
+          name
+        );
+        
+        setResult(prev => prev ? { ...prev, interpretation } : null);
+      } catch (interpretationError) {
+        console.error('Failed to generate interpretation:', interpretationError);
+        setError('Could not generate personalized interpretation. Please check your OpenAI API key.');
+      } finally {
+        setIsGeneratingInterpretation(false);
+        // Show email modal after basic interpretation is done
+        setTimeout(() => setShowEmailModal(true), 1500);
+      }
+    } catch (err) {
+      setError('An error occurred during calculation. Please try again.');
+      console.error('Calculation error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <div className="relative max-w-lg mx-auto">
-      {/* Mystical Aura */}
-      <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 via-purple-400/20 to-indigo-400/20 rounded-3xl blur-xl"></div>
+  const handleEmailSubmit = async (email: string) => {
+    if (!result) return;
+    
+    setIsGeneratingBangla(true);
+    try {
+      const banglaInterpretation = await getBanglaDetailedInterpretation(
+        result.number,
+        result.name,
+        result.vowels.join(''),
+        email
+      );
       
-      <form onSubmit={handleSubmit} className="relative">
-        <div className="relative mb-6">
-          {/* Sacred Input Field */}
-          <div className="relative">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your sacred name..."
-              className="w-full px-8 py-6 text-xl bg-slate-800/60 backdrop-blur-sm border-2 border-amber-400/30 rounded-2xl focus:border-amber-400 focus:outline-none transition-all duration-300 text-amber-100 placeholder-slate-400 shadow-lg"
-              disabled={isLoading}
-            />
-            
-            {/* Mystical Icon */}
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400/20 to-purple-400/20 rounded-full flex items-center justify-center border border-amber-400/30">
-                <Eye className="w-5 h-5 text-amber-400" />
-              </div>
-            </div>
-            
-            {/* Animated Border */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/0 via-amber-400/20 to-amber-400/0 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-          </div>
+      setBanglaResult({
+        interpretation: banglaInterpretation,
+        email
+      });
+      setShowEmailModal(false);
+    } catch (error) {
+      console.error('Failed to generate Bangla interpretation:', error);
+      setError('বাংলা বিশ্লেষণ তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।');
+    } finally {
+      setIsGeneratingBangla(false);
+    }
+  };
+
+  const handleReset = () => {
+    setResult(null);
+    setBanglaResult(null);
+    setShowEmailModal(false);
+    setError(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Mystical Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Sacred Geometry Patterns */}
+        <div className="absolute top-10 left-10 w-32 h-32 border border-amber-400/20 rotate-45 rounded-lg"></div>
+        <div className="absolute top-20 left-20 w-24 h-24 border border-amber-400/30 rotate-12 rounded-full"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 border border-purple-400/20 rotate-45">
+          <div className="w-full h-full border border-purple-400/30 rotate-45 rounded-lg"></div>
         </div>
         
-        {/* Mystical Submit Button */}
-        <button
-          type="submit"
-          disabled={!name.trim() || isLoading}
-          className="group relative w-full py-6 px-8 bg-gradient-to-r from-amber-600 to-purple-600 text-white rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl transform transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
-        >
-          {/* Button Glow Effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          
-          {/* Button Content */}
-          <div className="relative flex items-center justify-center space-x-3">
-            {isLoading ? (
-              <>
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                <span>Consulting the Oracle...</span>
-              </>
-            ) : (
-              <>
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                  <Calculator className="w-4 h-4" />
-                </div>
-                <span>Reveal Soul Urge</span>
-                <Sparkles className="w-5 h-5 opacity-80" />
-              </>
-            )}
+        {/* Floating Mystical Orbs */}
+        <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-amber-400 rounded-full animate-pulse opacity-60"></div>
+        <div className="absolute top-1/2 left-1/6 w-1 h-1 bg-purple-400 rounded-full animate-pulse opacity-80 delay-1000"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-3 h-3 bg-indigo-400 rounded-full animate-pulse opacity-40 delay-2000"></div>
+        
+        {/* Constellation Lines */}
+        <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="constellation" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+              <circle cx="50" cy="50" r="1" fill="#fbbf24"/>
+              <circle cx="150" cy="100" r="1" fill="#a855f7"/>
+              <circle cx="100" cy="150" r="1" fill="#6366f1"/>
+              <line x1="50" y1="50" x2="150" y2="100" stroke="#fbbf24" strokeWidth="0.5"/>
+              <line x1="150" y1="100" x2="100" y2="150" stroke="#a855f7" strokeWidth="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#constellation)"/>
+        </svg>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 py-12">
+        {/* Mystical Header */}
+        <div className="text-center mb-16">
+          <div className="relative inline-block mb-8">
+            {/* Sacred Circle with Inner Symbol */}
+            <div className="w-24 h-24 border-2 border-amber-400 rounded-full flex items-center justify-center relative bg-gradient-to-br from-amber-400/10 to-purple-400/10 backdrop-blur-sm">
+              <div className="w-16 h-16 border border-amber-300/50 rounded-full flex items-center justify-center">
+                <Eye className="w-8 h-8 text-amber-400" />
+              </div>
+              {/* Rotating outer ring */}
+              <div className="absolute inset-0 border border-purple-400/30 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
+            </div>
           </div>
           
-          {/* Mystical Particles */}
-          {!isLoading && (
-            <div className="absolute inset-0 overflow-hidden rounded-2xl">
-              <div className="absolute top-2 left-4 w-1 h-1 bg-white/60 rounded-full animate-pulse"></div>
-              <div className="absolute bottom-3 right-6 w-1 h-1 bg-white/40 rounded-full animate-pulse delay-1000"></div>
-              <div className="absolute top-1/2 right-4 w-0.5 h-0.5 bg-white/50 rounded-full animate-pulse delay-500"></div>
+          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+            সোল আর্জ ওরাকল
+          </h1>
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            <div className="w-12 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+            <Stars className="w-4 h-4 text-amber-400" />
+            <div className="w-12 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+          </div>
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-light">
+            প্রাচীন সংখ্যাতত্ত্বের মাধ্যমে আপনার আত্মার গভীরতম আকাঙ্ক্ষা ও পবিত্র সংখ্যার রহস্য উন্মোচন করুন
+          </p>
+        </div>
+
+        {/* API Key Notice */}
+        {!import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY === 'your_openai_api_key_here' ? (
+          <div className="max-w-2xl mx-auto mb-8 p-6 bg-amber-900/20 border border-amber-400/30 rounded-xl backdrop-blur-sm">
+            <div className="flex items-start space-x-3">
+              <Info className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-amber-300 mb-2">ওরাকল উন্নতি উপলব্ধ</h3>
+                <p className="text-sm text-amber-200/80">
+                  ডিজিটাল ওরাকল থেকে ব্যক্তিগত রহস্যময় ব্যাখ্যা পেতে আপনার OpenAI API কী যোগ করুন।
+                  পবিত্র গণনা এখনও আপনার সোল আর্জ নম্বর প্রকাশ করবে।
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Error Message */}
+        {error && (
+          <div className="max-w-2xl mx-auto mb-8 p-6 bg-red-900/20 border border-red-400/30 rounded-xl backdrop-blur-sm">
+            <div className="flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-red-300 mb-2">ভবিষ্যৎ বলা ব্যাহত</h3>
+                <p className="text-sm text-red-200/80">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <div className="max-w-4xl mx-auto">
+          {banglaResult ? (
+            <div className="space-y-8">
+              <BanglaResult 
+                interpretation={banglaResult.interpretation}
+                userName={result?.vowels.join('') || ''}
+            <div className="text-center">
+              <NameInput onCalculate={handleCalculate} isLoading={isLoading} />
+              
+              {/* Mystical Info Cards */}
+              <div className="mt-20 grid md:grid-cols-3 gap-8">
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-purple-400/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                  <div className="relative bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300">
+                    <div className="w-16 h-16 bg-gradient-to-br from-amber-400/20 to-amber-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-400/30">
+                      <Heart className="w-8 h-8 text-amber-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-amber-300 mb-3">Soul's Yearning</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">Discover the deepest desires that drive your spiritual essence and guide your life's journey.</p>
+                  </div>
+                </div>
+                
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-indigo-400/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                  <div className="relative bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-400/30">
+                      <Compass className="w-8 h-8 text-purple-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-purple-300 mb-3">Inner Compass</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">Understand the mystical forces that navigate your choices and illuminate your path.</p>
+                  </div>
+                </div>
+                
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-cyan-400/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                  <div className="relative bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 border border-indigo-400/20 hover:border-indigo-400/40 transition-all duration-300">
+                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-400/20 to-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-indigo-400/30">
+                      <Zap className="w-8 h-8 text-indigo-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-indigo-300 mb-3">Awakening</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">Align with your authentic vibration and unlock your highest potential.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              <SoulUrgeResult result={result} isLoading={isGeneratingInterpretation} />
+              
+              <CalculationSteps 
+                steps={calculateSteps(result.vowels)} 
+                calculation={result.calculation} 
+              />
+              
+              <div className="text-center">
+                <button
+                  onClick={handleReset}
+                  className="group relative px-8 py-4 bg-slate-800/60 backdrop-blur-sm text-amber-300 rounded-xl font-semibold shadow-lg border border-amber-400/30 hover:border-amber-400/60 transform transition-all duration-300 hover:scale-105"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 to-purple-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <span className="relative">Divine Another Name</span>
+                </button>
+              </div>
             </div>
           )}
-        </button>
-      </form>
+        </div>
+
+        {/* Mystical Footer */}
+        <div className="text-center mt-20">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <div className="w-8 h-px bg-gradient-to-r from-transparent via-slate-400 to-transparent"></div>
+            <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+            <div className="w-8 h-px bg-gradient-to-r from-transparent via-slate-400 to-transparent"></div>
+          </div>
+          <p className="text-slate-400 text-sm font-light">
+            The vowels of your birth name hold the keys to your soul's sacred blueprint
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
+
+export default App;

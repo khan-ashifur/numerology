@@ -5,18 +5,18 @@ const VOWEL_VALUES: Record<string, number> = {
 };
 
 const SOUL_URGE_NAMES: Record<number, string> = {
-  1: "The Leader",
-  2: "The Peacemaker", 
-  3: "The Creative",
-  4: "The Builder",
-  5: "The Freedom Seeker",
-  6: "The Nurturer",
-  7: "The Seeker",
-  8: "The Achiever",
-  9: "The Humanitarian",
-  11: "The Intuitive",
-  22: "The Master Builder",
-  33: "The Master Teacher"
+  1: "নেতা",
+  2: "শান্তিপ্রিয়", 
+  3: "সৃজনশীল",
+  4: "নির্মাতা",
+  5: "স্বাধীনতাপ্রিয়",
+  6: "পালনকর্তা",
+  7: "অন্বেষণকারী",
+  8: "অর্জনকারী",
+  9: "মানবতাবাদী",
+  11: "অন্তর্দর্শী",
+  22: "মহান নির্মাতা",
+  33: "মহান শিক্ষক"
 };
 
 export function extractVowels(name: string): string[] {

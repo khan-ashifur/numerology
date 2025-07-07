@@ -44,21 +44,21 @@ export function SoulUrgeResult({ result, isLoading }: SoulUrgeResultProps) {
           <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-amber-400 to-purple-400 bg-clip-text text-transparent">
             {result.name}
           </h2>
-          <p className="text-amber-300/80 mb-8 text-lg font-light">Your Soul's Sacred Vibration</p>
+          <p className="text-amber-300/80 mb-8 text-lg font-light">আপনার আত্মার পবিত্র কম্পন</p>
           
           {/* Mystical Attributes */}
           <div className="flex items-center justify-center space-x-8 text-sm mb-8">
             <div className="flex items-center space-x-2 text-amber-300">
               <Heart className="w-4 h-4" />
-              <span>Inner Fire</span>
+              <span>অন্তর্নিহিত আগুন</span>
             </div>
             <div className="flex items-center space-x-2 text-purple-300">
               <Eye className="w-4 h-4" />
-              <span>Soul Vision</span>
+              <span>আত্মার দৃষ্টি</span>
             </div>
             <div className="flex items-center space-x-2 text-indigo-300">
               <Star className="w-4 h-4" />
-              <span>Divine Purpose</span>
+              <span>ঐশ্বরিক উদ্দেশ্য</span>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@ export function SoulUrgeResult({ result, isLoading }: SoulUrgeResultProps) {
                 <div className="w-8 h-8 bg-gradient-to-br from-amber-400/20 to-purple-400/20 rounded-full flex items-center justify-center border border-amber-400/30">
                   <Sparkles className="w-4 h-4 text-amber-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-amber-300">Oracle's Revelation</h3>
+                <h3 className="text-xl font-semibold text-amber-300">দৈববাণীর প্রকাশ</h3>
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-400/20 to-indigo-400/20 rounded-full flex items-center justify-center border border-purple-400/30">
                   <Zap className="w-4 h-4 text-purple-400" />
                 </div>
@@ -84,7 +84,7 @@ export function SoulUrgeResult({ result, isLoading }: SoulUrgeResultProps) {
                 <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
                 <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-200"></div>
-                <span className="text-slate-300 ml-4 font-light">The oracle speaks...</span>
+                <span className="text-slate-300 ml-4 font-light">দৈববাণী বলছে...</span>
               </div>
             ) : (
               <div className="relative">

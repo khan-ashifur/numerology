@@ -3,8 +3,10 @@ import { Heart, Stars, Info, AlertCircle, Eye, Compass, Zap } from 'lucide-react
 import { NameInput } from './components/NameInput';
 import { SoulUrgeResult } from './components/SoulUrgeResult';
 import { CalculationSteps } from './components/CalculationSteps';
+import { EmailModal } from './components/EmailModal';
+import { BanglaResult } from './components/BanglaResult';
 import { calculateSoulUrge, calculateSteps } from './utils/numerology';
-import { getPersonalizedInterpretation } from './services/openai';
+import { getPersonalizedInterpretation, getBanglaDetailedInterpretation } from './services/openai';
 import { SoulUrgeResult as SoulUrgeResultType } from './types/numerology';
 
 function App() {
@@ -12,16 +14,23 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingInterpretation, setIsGeneratingInterpretation] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [banglaResult, setBanglaResult] = useState<{
+    interpretation: string;
+    email: string;
+  } | null>(null);
+  const [isGeneratingBangla, setIsGeneratingBangla] = useState(false);
 
   const handleCalculate = async (name: string) => {
     setIsLoading(true);
     setError(null);
+    setBanglaResult(null);
     
     try {
       const calculationResult = calculateSoulUrge(name);
       setResult(calculationResult);
       
-      // Generate personalized interpretation
+      // Generate basic interpretation
       setIsGeneratingInterpretation(true);
       try {
         const interpretation = await getPersonalizedInterpretation(
@@ -33,21 +42,48 @@ function App() {
         setResult(prev => prev ? { ...prev, interpretation } : null);
       } catch (interpretationError) {
         console.error('Failed to generate interpretation:', interpretationError);
-        setError('Could not generate personalized interpretation. Please check your OpenAI API key.');
+        setError('ব্যক্তিগত বিশ্লেষণ তৈরি করা যায়নি। অনুগ্রহ করে আপনার OpenAI API কী পরীক্ষা করুন।');
       } finally {
         setIsGeneratingInterpretation(false);
       }
     } catch (err) {
-      setError('An error occurred during calculation. Please try again.');
+      setError('গণনার সময় একটি ত্রুটি ঘটেছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
       console.error('Calculation error:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleEmailSubmit = async (email: string) => {
+    if (!result) return;
+    
+    setIsGeneratingBangla(true);
+    try {
+      const banglaInterpretation = await getBanglaDetailedInterpretation(
+        result.number,
+        result.name,
+        result.vowels.join(''),
+        email
+      );
+      
+      setBanglaResult({
+        interpretation: banglaInterpretation,
+        email
+      });
+      setShowEmailModal(false);
+    } catch (error) {
+      console.error('Failed to generate Bangla interpretation:', error);
+      setError('বাংলা বিশ্লেষণ তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।');
+    } finally {
+      setIsGeneratingBangla(false);
+    }
+  };
+
   const handleReset = () => {
     setResult(null);
     setError(null);
+    setBanglaResult(null);
+    setShowEmailModal(false);
   };
 
   return (
@@ -96,7 +132,7 @@ function App() {
           </div>
           
           <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            Soul Urge Oracle
+            সোল আর্জ ক্যালকুলেটর
           </h1>
           <div className="flex items-center justify-center space-x-2 mb-6">
             <div className="w-12 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
@@ -104,7 +140,7 @@ function App() {
             <div className="w-12 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
           </div>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-light">
-            Unveil the sacred numbers that govern your soul's deepest desires through the ancient art of numerological divination
+            প্রাচীন সংখ্যাতত্ত্বের মাধ্যমে আপনার আত্মার গভীরতম আকাঙ্ক্ষা আবিষ্কার করুন
           </p>
         </div>
 
@@ -114,10 +150,10 @@ function App() {
             <div className="flex items-start space-x-3">
               <Info className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-amber-300 mb-2">Oracle Enhancement Available</h3>
+                <h3 className="font-semibold text-amber-300 mb-2">বিশেষ সুবিধা উপলব্ধ</h3>
                 <p className="text-sm text-amber-200/80">
-                  Add your OpenAI API key to receive personalized mystical interpretations from the digital oracle.
-                  The sacred calculations will still reveal your Soul Urge Number.
+                  OpenAI API কী যোগ করুন এবং ব্যক্তিগত রহস্যময় বিশ্লেষণ পান।
+                  পবিত্র গণনা এখনও আপনার সোল আর্জ নম্বর প্রকাশ করবে।
                 </p>
               </div>
             </div>
@@ -130,7 +166,7 @@ function App() {
             <div className="flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-red-300 mb-2">Divination Disrupted</h3>
+                <h3 className="font-semibold text-red-300 mb-2">ভবিষ্যৎ দর্শনে বাধা</h3>
                 <p className="text-sm text-red-200/80">{error}</p>
               </div>
             </div>
@@ -151,8 +187,8 @@ function App() {
                     <div className="w-16 h-16 bg-gradient-to-br from-amber-400/20 to-amber-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-400/30">
                       <Heart className="w-8 h-8 text-amber-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-amber-300 mb-3">Soul's Yearning</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">Discover the deepest desires that drive your spiritual essence and guide your life's journey.</p>
+                    <h3 className="text-xl font-semibold text-amber-300 mb-3">আত্মার আকাঙ্ক্ষা</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">আপনার আধ্যাত্মিক সত্তার গভীরতম আকাঙ্ক্ষা আবিষ্কার করুন যা আপনার জীবনের যাত্রাকে পরিচালিত করে।</p>
                   </div>
                 </div>
                 
@@ -162,8 +198,8 @@ function App() {
                     <div className="w-16 h-16 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-400/30">
                       <Compass className="w-8 h-8 text-purple-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-purple-300 mb-3">Inner Compass</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">Understand the mystical forces that navigate your choices and illuminate your path.</p>
+                    <h3 className="text-xl font-semibold text-purple-300 mb-3">অন্তর্নিহিত দিকনির্দেশনা</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">রহস্যময় শক্তিগুলি বুঝুন যা আপনার পছন্দগুলি পরিচালনা করে এবং আপনার পথ আলোকিত করে।</p>
                   </div>
                 </div>
                 
@@ -173,8 +209,8 @@ function App() {
                     <div className="w-16 h-16 bg-gradient-to-br from-indigo-400/20 to-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-indigo-400/30">
                       <Zap className="w-8 h-8 text-indigo-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-indigo-300 mb-3">Awakening</h3>
-                    <p className="text-slate-300 text-sm leading-relaxed">Align with your authentic vibration and unlock your highest potential.</p>
+                    <h3 className="text-xl font-semibold text-indigo-300 mb-3">জাগরণ</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">আপনার প্রকৃত কম্পনের সাথে সামঞ্জস্য রাখুন এবং আপনার সর্বোচ্চ সম্ভাবনা আনলক করুন।</p>
                   </div>
                 </div>
               </div>
@@ -187,6 +223,45 @@ function App() {
                 steps={calculateSteps(result.vowels)} 
                 calculation={result.calculation} 
               />
+
+              {/* Get Detailed Analysis Button */}
+              {result.interpretation && !banglaResult && (
+                <div className="text-center">
+                  <button
+                    onClick={() => setShowEmailModal(true)}
+                    className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span className="relative flex items-center space-x-2">
+                      <Heart className="w-5 h-5" />
+                      <span>বাংলায় বিস্তারিত বিশ্লেষণ পান</span>
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {/* Bangla Detailed Result */}
+              {banglaResult && (
+                <BanglaResult
+                  interpretation={banglaResult.interpretation}
+                  userName={result.vowels.join('')}
+                  userEmail={banglaResult.email}
+                  soulUrgeNumber={result.number}
+                  soulUrgeName={result.name}
+                />
+              )}
+
+              {/* Loading Bangla Result */}
+              {isGeneratingBangla && (
+                <BanglaResult
+                  interpretation=""
+                  userName={result.vowels.join('')}
+                  userEmail=""
+                  soulUrgeNumber={result.number}
+                  soulUrgeName={result.name}
+                  isLoading={true}
+                />
+              )}
               
               <div className="text-center">
                 <button
@@ -194,7 +269,7 @@ function App() {
                   className="group relative px-8 py-4 bg-slate-800/60 backdrop-blur-sm text-amber-300 rounded-xl font-semibold shadow-lg border border-amber-400/30 hover:border-amber-400/60 transform transition-all duration-300 hover:scale-105"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 to-purple-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <span className="relative">Divine Another Name</span>
+                  <span className="relative">অন্য নাম গণনা করুন</span>
                 </button>
               </div>
             </div>
@@ -209,10 +284,20 @@ function App() {
             <div className="w-8 h-px bg-gradient-to-r from-transparent via-slate-400 to-transparent"></div>
           </div>
           <p className="text-slate-400 text-sm font-light">
-            The vowels of your birth name hold the keys to your soul's sacred blueprint
+            আপনার জন্মনামের স্বরবর্ণগুলি আপনার আত্মার পবিত্র নকশার চাবিকাঠি ধারণ করে
           </p>
         </div>
       </div>
+
+      {/* Email Modal */}
+      <EmailModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        onSubmit={handleEmailSubmit}
+        isLoading={isGeneratingBangla}
+        soulUrgeNumber={result?.number || 0}
+        soulUrgeName={result?.name || ''}
+      />
     </div>
   );
 }

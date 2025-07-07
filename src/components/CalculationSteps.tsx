@@ -20,7 +20,7 @@ export function CalculationSteps({ steps, calculation }: CalculationStepsProps) 
         <div className="flex items-center justify-center mb-8">
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
-            <h3 className="text-xl font-semibold text-amber-300">Sacred Calculation</h3>
+            <h3 className="text-xl font-semibold text-amber-300">পবিত্র গণনা</h3>
             <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-500"></div>
           </div>
         </div>
@@ -62,7 +62,7 @@ export function CalculationSteps({ steps, calculation }: CalculationStepsProps) 
             <div className="flex items-center justify-center mb-4">
               <div className="flex items-center space-x-2">
                 <Sparkles className="w-5 h-5 text-purple-400" />
-                <span className="text-purple-300 font-semibold">Divine Mathematics</span>
+                <span className="text-purple-300 font-semibold">ঐশ্বরিক গণিত</span>
                 <Sparkles className="w-5 h-5 text-purple-400" />
               </div>
             </div>
