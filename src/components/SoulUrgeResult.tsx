@@ -1,9 +1,9 @@
 import React from 'react';
 import { Heart, Sparkles, User } from 'lucide-react';
-import { SoulUrgeResult } from '../types/numerology';
+import { SoulUrgeResult as SoulUrgeResultType } from '../types/numerology';
 
 interface SoulUrgeResultProps {
-  result: SoulUrgeResult;
+  result: SoulUrgeResultType;
   isLoading?: boolean;
 }
 
