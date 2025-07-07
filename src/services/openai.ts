@@ -11,19 +11,19 @@ export async function getPersonalizedInterpretation(
   userName: string
 ): Promise<string> {
   try {
-    const prompt = `You are a professional numerologist providing a personalized Soul Urge Number interpretation. 
+    const prompt = `আপনি একজন পেশাদার সংখ্যাতত্ত্ববিদ যিনি ব্যক্তিগত সোল আর্জ নম্বর ব্যাখ্যা প্রদান করেন।
 
-The person's name is "${userName}" and their Soul Urge Number is ${soulUrgeNumber} (${soulUrgeName}).
+ব্যক্তির নাম "${userName}" এবং তাদের সোল আর্জ নম্বর ${soulUrgeNumber} (${soulUrgeName})।
 
-Please provide a warm, insightful, and personalized interpretation that:
-- Explains what this Soul Urge Number means for their inner desires and motivations
-- Describes their core emotional needs and what drives them at a soul level
-- Offers guidance on how they can align with their authentic self
-- Mentions specific strengths and potential challenges
-- Keeps a positive, empowering tone
-- Is approximately 150-200 words
+অনুগ্রহ করে একটি উষ্ণ, অন্তর্দৃষ্টিপূর্ণ এবং ব্যক্তিগত ব্যাখ্যা প্রদান করুন যাতে থাকবে:
+- এই সোল আর্জ নম্বর তাদের অন্তর্নিহিত আকাঙ্ক্ষা এবং প্রেরণার জন্য কী অর্থ বহন করে
+- তাদের মূল আবেগিক চাহিদা এবং আত্মিক স্তরে কী তাদের চালিত করে
+- কীভাবে তারা তাদের প্রকৃত সত্তার সাথে সামঞ্জস্য রাখতে পারে সে বিষয়ে নির্দেশনা
+- নির্দিষ্ট শক্তি এবং সম্ভাব্য চ্যালেঞ্জের উল্লেখ
+- ইতিবাচক, ক্ষমতায়নকারী টোন বজায় রাখুন
+- প্রায় ১৫০-২০০ শব্দের মধ্যে হোক
 
-Make it feel personal and meaningful, not generic.`;
+এটি ব্যক্তিগত এবং অর্থবহ অনুভব করান, সাধারণ নয়। সম্পূর্ণ বাংলায় লিখুন।`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -33,10 +33,10 @@ Make it feel personal and meaningful, not generic.`;
     });
 
     return completion.choices[0]?.message?.content || 
-           "Unable to generate interpretation at this time. Please try again.";
+           "এই মুহূর্তে ব্যাখ্যা তৈরি করা সম্ভব হচ্ছে না। অনুগ্রহ করে আবার চেষ্টা করুন।";
   } catch (error) {
     console.error('OpenAI API Error:', error);
-    throw new Error('Failed to generate personalized interpretation. Please check your API key and try again.');
+    throw new Error('ব্যক্তিগত ব্যাখ্যা তৈরি করতে ব্যর্থ। অনুগ্রহ করে আপনার API কী পরীক্ষা করুন এবং আবার চেষ্টা করুন।');
   }
 }
 
