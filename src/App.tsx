@@ -42,7 +42,8 @@ function App() {
         setResult(prev => prev ? { ...prev, interpretation } : null);
       } catch (interpretationError) {
         console.error('Failed to generate interpretation:', interpretationError);
-        setError('ব্যক্তিগত বিশ্লেষণ তৈরি করা যায়নি। অনুগ্রহ করে আপনার OpenAI API কী পরীক্ষা করুন।');
+        // Don't show error for missing API key, just continue without interpretation
+        setResult(prev => prev ? { ...prev, interpretation: null } : null);
       } finally {
         setIsGeneratingInterpretation(false);
       }

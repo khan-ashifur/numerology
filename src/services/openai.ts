@@ -1,7 +1,10 @@
 import OpenAI from 'openai';
 
+// Check if API key is available
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey: apiKey || 'dummy-key',
   dangerouslyAllowBrowser: true
 });
 
@@ -10,6 +13,11 @@ export async function getPersonalizedInterpretation(
   soulUrgeName: string, 
   userName: string
 ): Promise<string> {
+  // Check if API key is available
+  if (!apiKey || apiKey === 'your_openai_api_key_here') {
+    throw new Error('OpenAI API key not configured');
+  }
+
   try {
     const prompt = `আপনি একজন পেশাদার সংখ্যাতত্ত্ববিদ যিনি ব্যক্তিগত সোল আর্জ নম্বর ব্যাখ্যা প্রদান করেন।
 
@@ -46,6 +54,11 @@ export async function getBanglaDetailedInterpretation(
   userName: string,
   userEmail: string
 ): Promise<string> {
+  // Check if API key is available
+  if (!apiKey || apiKey === 'your_openai_api_key_here') {
+    throw new Error('OpenAI API key not configured');
+  }
+
   try {
     const prompt = `আপনি একজন পেশাদার সংখ্যাতত্ত্ববিদ যিনি বাংলায় বিস্তারিত সোল আর্জ নম্বর বিশ্লেষণ প্রদান করেন।
 
