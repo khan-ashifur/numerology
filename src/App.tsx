@@ -210,8 +210,8 @@ function App() {
                       <Zap className="w-8 h-8 text-indigo-400" />
                     </div>
                     <h3 className="text-xl font-semibold text-indigo-300 mb-3">জাগরণ</h3>
-                  <h3 className="text-xl font-semibold text-amber-300 mb-3">আত্মার আকাঙ্ক্ষা</h3>
-                  <p className="text-slate-300 text-sm leading-relaxed">আপনার আধ্যাত্মিক সত্তার গভীরতম আকাঙ্ক্ষা আবিষ্কার করুন যা আপনার জীবনের যাত্রাকে পরিচালিত করে।</p>
+                    <p className="text-slate-300 text-sm leading-relaxed">আপনার প্রকৃত কম্পনের সাথে সামঞ্জস্য রাখুন এবং আপনার সর্বোচ্চ সম্ভাবনা আনলক করুন।</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -235,8 +235,8 @@ function App() {
                     <span className="relative flex items-center space-x-2">
                       <Heart className="w-5 h-5" />
                       <span>বাংলায় বিস্তারিত বিশ্লেষণ পান</span>
-                  <h3 className="text-xl font-semibold text-indigo-300 mb-3">জাগরণ</h3>
-                  <p className="text-slate-300 text-sm leading-relaxed">আপনার প্রকৃত কম্পনের সাথে সামঞ্জস্য রাখুন এবং আপনার সর্বোচ্চ সম্ভাবনা আনলক করুন।</p>
+                    </span>
+                  </button>
                 </div>
               )}
 
