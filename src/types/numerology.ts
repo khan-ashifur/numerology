@@ -1,6 +1,9 @@
 export interface SoulUrgeResult {
   number: number;
   name: string;
+  description: string;
+  powers: string[];
+  challenges: string[];
   vowels: string[];
   calculation: string;
   interpretation?: string;
