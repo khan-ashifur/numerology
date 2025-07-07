@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Sparkles, User, Eye, Star, Zap, Shield, Flame, Crown, Compass, Lightning, Gem } from 'lucide-react';
+import { Heart, Sparkles, User, Eye, Star, Zap, Shield, Flame, Crown, Compass, CloudLightning as Lightning, Gem } from 'lucide-react';
 import { SoulUrgeResult as SoulUrgeResultType } from '../types/numerology';
 
 interface SoulUrgeResultProps {
