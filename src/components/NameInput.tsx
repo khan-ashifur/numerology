@@ -181,7 +181,10 @@ function App() {
               <BanglaResult 
                 interpretation={banglaResult.interpretation}
                 userName={result?.vowels.join('') || ''}
-            <div className="text-center">
+              />
+            </div>
+          ) : (
+            <div className="space-y-8">
               <NameInput onCalculate={handleCalculate} isLoading={isLoading} />
               
               {/* Mystical Info Cards */}
@@ -218,25 +221,6 @@ function App() {
                     <p className="text-slate-300 text-sm leading-relaxed">Align with your authentic vibration and unlock your highest potential.</p>
                   </div>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              <SoulUrgeResult result={result} isLoading={isGeneratingInterpretation} />
-              
-              <CalculationSteps 
-                steps={calculateSteps(result.vowels)} 
-                calculation={result.calculation} 
-              />
-              
-              <div className="text-center">
-                <button
-                  onClick={handleReset}
-                  className="group relative px-8 py-4 bg-slate-800/60 backdrop-blur-sm text-amber-300 rounded-xl font-semibold shadow-lg border border-amber-400/30 hover:border-amber-400/60 transform transition-all duration-300 hover:scale-105"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 to-purple-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <span className="relative">Divine Another Name</span>
-                </button>
               </div>
             </div>
           )}
