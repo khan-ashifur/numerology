@@ -145,20 +145,6 @@ function App() {
         </div>
 
         {/* API Key Notice */}
-        {!import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY === 'your_openai_api_key_here' ? (
-          <div className="max-w-2xl mx-auto mb-8 p-6 bg-amber-900/20 border border-amber-400/30 rounded-xl backdrop-blur-sm">
-            <div className="flex items-start space-x-3">
-              <Info className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold text-amber-300 mb-2">বিশেষ সুবিধা উপলব্ধ</h3>
-                <p className="text-sm text-amber-200/80">
-                  OpenAI API কী যোগ করুন এবং ব্যক্তিগত রহস্যময় বিশ্লেষণ পান।
-                  পবিত্র গণনা এখনও আপনার সোল আর্জ নম্বর প্রকাশ করবে।
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : null}
 
         {/* Error Message */}
         {error && (
