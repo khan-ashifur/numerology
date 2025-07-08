@@ -14,6 +14,24 @@ export function EmailPrompt({ onSubmit, type }: EmailPromptProps) {
     e.preventDefault();
     if (email.trim() && email.includes('@')) {
       setIsSubmitting(true);
+      
+      // Submit to Netlify Forms
+      try {
+        const formData = new FormData();
+        formData.append('email', email.trim());
+        formData.append('calculation-type', type === 'soul-urge' ? 'সোল আর্জ' : 'লাইফ পাথ');
+        formData.append('timestamp', new Date().toLocaleString('bn-BD'));
+        
+        await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData as any).toString()
+        });
+      } catch (error) {
+        console.log('Form submission error:', error);
+        // Continue anyway - don't block the user experience
+      }
+      
       await onSubmit(email.trim());
       setIsSubmitting(false);
     }
@@ -93,9 +111,13 @@ export function EmailPrompt({ onSubmit, type }: EmailPromptProps) {
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Hidden Netlify form fields */}
+              <input type="hidden" name="form-name" value="numerology-emails" />
+              
               <div className="relative">
                 <input
                   type="email"
+                  name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="আপনার ইমেইল ঠিকানা লিখুন"
@@ -108,6 +130,10 @@ export function EmailPrompt({ onSubmit, type }: EmailPromptProps) {
                   <Mail className={`w-6 h-6 ${type === 'soul-urge' ? 'text-amber-400/60' : 'text-purple-400/60'}`} />
                 </div>
               </div>
+              
+              {/* Hidden fields for additional data */}
+              <input type="hidden" name="calculation-type" value={type === 'soul-urge' ? 'সোল আর্জ' : 'লাইফ পাথ'} />
+              <input type="hidden" name="timestamp" value={new Date().toLocaleString('bn-BD')} />
 
               <button
                 type="submit"

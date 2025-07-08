@@ -8,6 +8,14 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Hidden Netlify form for email collection -->
+    <form name="numerology-emails" netlify hidden>
+      <input type="email" name="email" />
+      <input type="text" name="calculation-type" />
+      <input type="text" name="timestamp" />
+    </form>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
