@@ -18,12 +18,14 @@ export interface CalculationResult {
   inputMethod: string;
   inputValue: string;
   reading?: string;
+  userEmail?: string;
 }
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [isGeneratingReading, setIsGeneratingReading] = useState(false);
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
 
   const handleSoulUrgeCalculation = async (name: string) => {
     const calculationResult = calculateSoulUrge(name);
@@ -37,22 +39,7 @@ function App() {
     
     setResult(result);
     setCurrentScreen('results');
-    
-    // Generate personalized reading
-    setIsGeneratingReading(true);
-    try {
-      const reading = await getPersonalizedReading(
-        result.type,
-        result.inputMethod,
-        result.inputValue,
-        result.number
-      );
-      setResult(prev => prev ? { ...prev, reading } : null);
-    } catch (error) {
-      console.error('Failed to generate reading:', error);
-    } finally {
-      setIsGeneratingReading(false);
-    }
+    setShowEmailPrompt(true);
   };
 
   const handleLifePathCalculation = async (birthdate: string) => {
@@ -67,8 +54,16 @@ function App() {
     
     setResult(result);
     setCurrentScreen('results');
+    setShowEmailPrompt(true);
+  };
+
+  const handleEmailSubmit = async (email: string) => {
+    if (!result) return;
     
-    // Generate personalized reading
+    setShowEmailPrompt(false);
+    setResult(prev => prev ? { ...prev, userEmail: email } : null);
+    
+    // Generate personalized reading after email is provided
     setIsGeneratingReading(true);
     try {
       const reading = await getPersonalizedReading(
@@ -88,6 +83,7 @@ function App() {
   const handleBackToHome = () => {
     setCurrentScreen('home');
     setResult(null);
+    setShowEmailPrompt(false);
   };
 
   const handleBackToInput = () => {
@@ -97,6 +93,7 @@ function App() {
       setCurrentScreen('life-path');
     }
     setResult(null);
+    setShowEmailPrompt(false);
   };
 
   return (
@@ -155,7 +152,9 @@ function App() {
         {currentScreen === 'results' && result && (
           <ResultsPage
             result={result}
+            showEmailPrompt={showEmailPrompt}
             isGeneratingReading={isGeneratingReading}
+            onEmailSubmit={handleEmailSubmit}
             onBack={handleBackToInput}
             onHome={handleBackToHome}
           />

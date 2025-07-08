@@ -1,15 +1,18 @@
 import React from 'react';
 import { ArrowLeft, Home, Heart, Calendar, Sparkles, Eye, Crown, Compass } from 'lucide-react';
 import { CalculationResult } from '../App';
+import { EmailPrompt } from './EmailPrompt';
 
 interface ResultsPageProps {
   result: CalculationResult;
+  showEmailPrompt: boolean;
   isGeneratingReading: boolean;
+  onEmailSubmit: (email: string) => void;
   onBack: () => void;
   onHome: () => void;
 }
 
-export function ResultsPage({ result, isGeneratingReading, onBack, onHome }: ResultsPageProps) {
+export function ResultsPage({ result, showEmailPrompt, isGeneratingReading, onEmailSubmit, onBack, onHome }: ResultsPageProps) {
   const getIcon = () => {
     return result.type === 'soul-urge' ? Heart : Calendar;
   };
@@ -35,6 +38,14 @@ export function ResultsPage({ result, isGeneratingReading, onBack, onHome }: Res
   const Icon = getIcon();
 
   return (
+    <>
+      {showEmailPrompt && (
+        <EmailPrompt
+          onSubmit={onEmailSubmit}
+          type={result.type}
+        />
+      )}
+      
     <div className="container mx-auto px-4 py-12">
       {/* Navigation */}
       <div className="flex justify-between items-center mb-8">
@@ -154,13 +165,35 @@ export function ResultsPage({ result, isGeneratingReading, onBack, onHome }: Res
             
             {isGeneratingReading ? (
               <div className="flex flex-col items-center justify-center space-y-6 py-16">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 ${result.type === 'soul-urge' ? 'bg-amber-400' : 'bg-purple-400'} rounded-full animate-bounce`}></div>
-                  <div className={`w-3 h-3 ${result.type === 'soul-urge' ? 'bg-orange-400' : 'bg-indigo-400'} rounded-full animate-bounce delay-100`}></div>
-                  <div className={`w-3 h-3 ${result.type === 'soul-urge' ? 'bg-red-400' : 'bg-blue-400'} rounded-full animate-bounce delay-200`}></div>
+                {/* Mystical Loading Animation */}
+                <div className="relative">
+                  <div className={`w-24 h-24 border-4 ${result.type === 'soul-urge' ? 'border-amber-400/30' : 'border-purple-400/30'} rounded-full animate-spin`}>
+                    <div className={`absolute inset-2 border-2 ${result.type === 'soul-urge' ? 'border-orange-400/50' : 'border-indigo-400/50'} rounded-full animate-spin`} style={{animationDirection: 'reverse', animationDuration: '3s'}}></div>
+                    <div className={`absolute inset-4 border ${result.type === 'soul-urge' ? 'border-amber-400' : 'border-purple-400'} rounded-full animate-pulse`}></div>
+                  </div>
+                  <div className={`absolute inset-0 flex items-center justify-center`}>
+                    <Eye className={`w-8 h-8 ${result.type === 'soul-urge' ? 'text-amber-400' : 'text-purple-400'} animate-pulse`} />
+                  </div>
                 </div>
-                <p className="text-slate-300 text-lg font-light">আপনার জন্য বিশেষ পাঠ তৈরি করা হচ্ছে...</p>
-                <p className="text-slate-400 text-sm">এটি কয়েক মুহূর্ত সময় নিতে পারে</p>
+                
+                <div className="text-center space-y-3">
+                  <p className={`text-2xl font-semibold ${result.type === 'soul-urge' ? 'text-amber-300' : 'text-purple-300'}`}>
+                    আপনার বিস্তারিত ফলাফল বের হচ্ছে...
+                  </p>
+                  <p className="text-slate-300 text-lg font-light">
+                    আপনার জন্য বিশেষ AI বিশ্লেষণ তৈরি করা হচ্ছে
+                  </p>
+                  <p className="text-slate-400 text-sm">
+                    এই গভীর পাঠ তৈরি করতে কয়েক মুহূর্ত সময় লাগবে
+                  </p>
+                  
+                  {/* Floating mystical elements */}
+                  <div className="flex items-center justify-center space-x-4 mt-6">
+                    <div className={`w-2 h-2 ${result.type === 'soul-urge' ? 'bg-amber-400' : 'bg-purple-400'} rounded-full animate-bounce`}></div>
+                    <div className={`w-2 h-2 ${result.type === 'soul-urge' ? 'bg-orange-400' : 'bg-indigo-400'} rounded-full animate-bounce delay-100`}></div>
+                    <div className={`w-2 h-2 ${result.type === 'soul-urge' ? 'bg-red-400' : 'bg-blue-400'} rounded-full animate-bounce delay-200`}></div>
+                  </div>
+                </div>
               </div>
             ) : result.reading ? (
               <div className="relative">
@@ -177,7 +210,7 @@ export function ResultsPage({ result, isGeneratingReading, onBack, onHome }: Res
             ) : (
               <div className="text-center py-8">
                 <p className="text-slate-400 text-lg">
-                  ব্যক্তিগত পাঠ তৈরি করতে OpenAI API কী প্রয়োজন।
+                  ব্যক্তিগত পাঠ তৈরি করতে ইমেইল প্রয়োজন।
                 </p>
               </div>
             )}
@@ -185,5 +218,6 @@ export function ResultsPage({ result, isGeneratingReading, onBack, onHome }: Res
         </div>
       </div>
     </div>
+    </>
   );
 }
