@@ -24,7 +24,8 @@ export function EmailPrompt({ onSubmit, type }: EmailPromptProps) {
         
         
 
-const backendURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const backendURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+
 
 await fetch(`${backendURL}/api/save-email/`, {
   method: 'POST',
