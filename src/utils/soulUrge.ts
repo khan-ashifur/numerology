@@ -1,4 +1,8 @@
-import { SoulUrgeResult, CalculationStep } from '../types/numerology';
+export interface SoulUrgeResult {
+  number: number;
+  name: string;
+  description: string;
+}
 
 const VOWEL_VALUES: Record<string, number> = {
   A: 1, E: 5, I: 9, O: 6, U: 3, Y: 7
@@ -34,48 +38,10 @@ const SOUL_URGE_DESCRIPTIONS: Record<number, string> = {
   33: "আপনার আত্মা নিঃশর্ত ভালোবাসা ও জ্ঞানের প্রতীক। আপনি মহান শিক্ষক, যিনি অন্যদের আত্মিক উন্নতিতে সহায়তা করেন।"
 };
 
-const SOUL_URGE_POWERS: Record<number, string[]> = {
-  1: ["প্রাকৃতিক নেতৃত্ব", "অগ্রগামী চিন্তাভাবনা", "সাহসিকতা", "স্বাধীনতা"],
-  2: ["কূটনৈতিক দক্ষতা", "সহযোগিতার মনোভাব", "সংবেদনশীলতা", "শান্তি স্থাপন"],
-  3: ["শৈল্পিক প্রতিভা", "যোগাযোগ দক্ষতা", "আশাবাদ", "সৃজনশীল সমাধান"],
-  4: ["সংগঠন ক্ষমতা", "নির্ভরযোগ্যতা", "ধৈর্য", "ব্যবহারিক বুদ্ধি"],
-  5: ["অভিযোজন ক্ষমতা", "কৌতূহল", "বহুমুখী প্রতিভা", "স্বাধীনতাপ্রিয়তা"],
-  6: ["যত্নশীলতা", "দায়িত্ববোধ", "সহানুভূতি", "পারিবারিক মূল্যবোধ"],
-  7: ["গভীর চিন্তাভাবনা", "আধ্যাত্মিক অন্তর্দৃষ্টি", "বিশ্লেষণী ক্ষমতা", "একাগ্রতা"],
-  8: ["ব্যবসায়িক বুদ্ধি", "উচ্চাভিলাষ", "সাংগঠনিক দক্ষতা", "বস্তুগত সাফল্য"],
-  9: ["মানবিক দৃষ্টিভঙ্গি", "উদারতা", "সহানুভূতি", "বিশ্বব্যাপী চিন্তাভাবনা"],
-  11: ["অন্তর্দৃষ্টি", "আধ্যাত্মিক নেতৃত্ব", "অনুপ্রেরণা", "উচ্চতর সচেতনতা"],
-  22: ["বিশাল স্বপ্ন বাস্তবায়ন", "মাস্টার প্ল্যানিং", "বিশ্ব পরিবর্তন", "স্থায়ী প্রভাব"],
-  33: ["নিঃশর্ত ভালোবাসা", "আধ্যাত্মিক শিক্ষা", "নিরাময় শক্তি", "মানবিক উন্নতি"]
-};
-
-const SOUL_URGE_CHALLENGES: Record<number, string[]> = {
-  1: ["অহংকার নিয়ন্ত্রণ", "অধৈর্যতা", "একগুঁয়েমি", "অন্যদের মতামত গ্রহণ"],
-  2: ["অতিরিক্ত সংবেদনশীলতা", "সিদ্ধান্তহীনতা", "দ্বন্দ্ব এড়ানো", "আত্মবিশ্বাসের অভাব"],
-  3: ["মনোযোগের অভাব", "অতিরিক্ত আবেগপ্রবণতা", "অগভীরতা", "সমালোচনা সহ্য করা"],
-  4: ["অনমনীয়তা", "অতিরিক্ত সতর্কতা", "পরিবর্তন গ্রহণে অনীহা", "কাজের চাপ"],
-  5: ["অস্থিরতা", "প্রতিশ্রুতি রক্ষায় অনীহা", "অধৈর্যতা", "গভীরতার অভাব"],
-  6: ["অতিরিক্ত দায়িত্ববোধ", "নিজের প্রয়োজন উপেক্ষা", "নিয়ন্ত্রণপ্রিয়তা", "সীমানা নির্ধারণ"],
-  7: ["সামাজিক বিচ্ছিন্নতা", "অতিরিক্ত বিশ্লেষণ", "সন্দেহপ্রবণতা", "আবেগ প্রকাশে অসুবিধা"],
-  8: ["ক্ষমতার অপব্যবহার", "বস্তুবাদ", "কাজের নেশা", "সম্পর্কে অবহেলা"],
-  9: ["আদর্শবাদিতা", "হতাশা", "অতিরিক্ত দান", "ব্যক্তিগত সীমানা"],
-  11: ["অতিরিক্ত সংবেদনশীলতা", "আধ্যাত্মিক অহংকার", "বাস্তবতা থেকে বিচ্ছিন্নতা", "চাপ সহ্য করা"],
-  22: ["অতিরিক্ত চাপ", "অবাস্তব প্রত্যাশা", "পূর্ণতাবাদ", "ভারসাম্য রক্ষা"],
-  33: ["আত্মত্যাগের প্রবণতা", "অতিরিক্ত দায়িত্ববোধ", "নিজের প্রয়োজন উপেক্ষা", "আবেগিক ক্লান্তি"]
-};
-
 export function extractVowels(name: string): string[] {
   return name.toUpperCase()
     .split('')
     .filter(char => VOWEL_VALUES.hasOwnProperty(char));
-}
-
-export function calculateSteps(vowels: string[]): CalculationStep[] {
-  return vowels.map((vowel, index) => ({
-    letter: vowel,
-    value: VOWEL_VALUES[vowel],
-    position: index
-  }));
 }
 
 export function reduceToSingleDigit(num: number): number {
@@ -100,21 +66,12 @@ export function reduceToSingleDigit(num: number): number {
 
 export function calculateSoulUrge(fullName: string): SoulUrgeResult {
   const vowels = extractVowels(fullName);
-  const steps = calculateSteps(vowels);
-  const sum = steps.reduce((total, step) => total + step.value, 0);
+  const sum = vowels.reduce((total, vowel) => total + VOWEL_VALUES[vowel], 0);
   const finalNumber = reduceToSingleDigit(sum);
-  
-  const calculation = steps.length > 0 
-    ? `${steps.map(s => `${s.letter}(${s.value})`).join(' + ')} = ${sum}${sum !== finalNumber ? ` → ${finalNumber}` : ''}`
-    : '';
 
   return {
     number: finalNumber,
     name: SOUL_URGE_NAMES[finalNumber] || "Unknown",
-    description: SOUL_URGE_DESCRIPTIONS[finalNumber] || "",
-    powers: SOUL_URGE_POWERS[finalNumber] || [],
-    challenges: SOUL_URGE_CHALLENGES[finalNumber] || [],
-    vowels,
-    calculation
+    description: SOUL_URGE_DESCRIPTIONS[finalNumber] || ""
   };
 }
