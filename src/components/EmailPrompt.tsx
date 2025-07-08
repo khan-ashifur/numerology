@@ -22,11 +22,23 @@ export function EmailPrompt({ onSubmit, type }: EmailPromptProps) {
         formData.append('calculation-type', type === 'soul-urge' ? 'সোল আর্জ' : 'লাইফ পাথ');
         formData.append('timestamp', new Date().toLocaleString('bn-BD'));
         
-        await fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(formData as any).toString()
-        });
+        
+
+const backendURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+await fetch(`${backendURL}/api/save-email/`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: email.trim(),
+    type: type === 'soul-urge' ? 'সোল আর্জ' : 'লাইফ পাথ',
+    timestamp: new Date().toLocaleString('bn-BD'),
+  }),
+});
+
+
       } catch (error) {
         console.log('Form submission error:', error);
         // Continue anyway - don't block the user experience

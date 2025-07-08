@@ -22,6 +22,8 @@ export interface CalculationResult {
 }
 
 function App() {
+  console.log("🔐 FRONTEND ENV CHECK: VITE_OPENAI_API_KEY =", import.meta.env.VITE_OPENAI_API_KEY);
+
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [isGeneratingReading, setIsGeneratingReading] = useState(false);
